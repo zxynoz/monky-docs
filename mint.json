@@ -67,15 +67,6 @@
       ]
     },
     {
-      "group": "Guides",
-      "pages": [
-        "guides/wallet-setup",
-        "guides/first-transaction",
-        "guides/security-best-practices",
-        "guides/troubleshooting"
-      ]
-    },
-    {
       "group": "API Documentation",
       "pages": [
         "api-reference/introduction",
