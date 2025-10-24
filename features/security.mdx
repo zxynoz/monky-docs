@@ -1,0 +1,280 @@
+---
+title: "Security Features"
+description: "Military-grade security that keeps your assets safe. Learn about M.O.N.K.Y's comprehensive security measures."
+icon: "shield-check"
+---
+
+## Security First Philosophy
+
+At M.O.N.K.Y, security isn't an afterthought—it's built into every layer of our architecture. We understand that in the world of digital assets, security is paramount. That's why we've implemented military-grade security measures to protect your funds and personal information.
+
+<Card title="🛡️ Zero-Knowledge Architecture" icon="shield-check">
+  Your private keys never leave your device. M.O.N.K.Y operates on a zero-knowledge basis, meaning we cannot access your funds even if we wanted to.
+</Card>
+
+## Core Security Features
+
+### 🔐 **256-bit Encryption**
+
+All sensitive data is protected using AES-256 encryption, the same standard used by government agencies and military organizations worldwide.
+
+<CardGroup cols={2}>
+  <Card title="Data at Rest" icon="database">
+    Private keys and sensitive data are encrypted before being stored locally on your device.
+  </Card>
+  <Card title="Data in Transit" icon="network-wired">
+    All communications are secured with TLS 1.3 encryption and certificate pinning.
+  </Card>
+</CardGroup>
+
+### 🔑 **Local Key Management**
+
+<Warning>
+**Your keys, your crypto**: M.O.N.K.Y never has access to your private keys. They are generated and stored exclusively on your device.
+</Warning>
+
+#### Key Generation
+- **Cryptographically Secure Random Number Generation**: Using `crypto.getRandomValues()` for true randomness
+- **BIP39 Mnemonic Support**: Standard 12/24-word recovery phrases
+- **Hierarchical Deterministic (HD) Wallets**: BIP44 compliant derivation paths
+- **Multiple Account Support**: Generate unlimited accounts from a single seed phrase
+
+#### Key Storage
+- **Browser Secure Storage**: Encrypted storage using Web Crypto API
+- **Hardware Security Module (HSM) Integration**: Support for hardware wallets like Ledger
+- **Local Encryption**: Keys are encrypted with device-specific entropy before storage
+- **No Cloud Storage**: Keys are never synchronized or backed up to cloud services
+
+### 🏗️ **Multi-Signature Support**
+
+<Info>
+Multi-signature wallets require multiple signatures to authorize transactions, providing an additional layer of security for high-value accounts.
+</Info>
+
+#### Supported Configurations
+- **2-of-2 Multi-sig**: Requires both parties to sign transactions
+- **2-of-3 Multi-sig**: Any 2 out of 3 parties can authorize transactions  
+- **3-of-5 Multi-sig**: Any 3 out of 5 parties can authorize transactions
+- **Custom Configurations**: Flexible threshold signatures for enterprise use
+
+#### Use Cases
+- **Business Accounts**: Require approval from multiple team members
+- **Family Accounts**: Shared control between family members
+- **Trust Funds**: Multiple trustees required for withdrawals
+- **DAO Treasury**: Decentralized governance for organization funds
+
+### 🔒 **Two-Factor Authentication (2FA)**
+
+Add an extra layer of security with multiple 2FA options:
+
+<Tabs>
+  <Tab title="App-based 2FA">
+    **Supported Apps:**
+    - Google Authenticator
+    - Authy
+    - Microsoft Authenticator
+    - 1Password
+    - Bitwarden
+
+    **Setup Process:**
+    1. Enable 2FA in wallet settings
+    2. Scan QR code with your authenticator app
+    3. Enter verification code to confirm setup
+    4. Save backup codes in a secure location
+  </Tab>
+
+  <Tab title="SMS 2FA">
+    **Features:**
+    - Global SMS support
+    - Multiple phone number backup
+    - Rate limiting for security
+    - Fallback options available
+
+    **Security Note:**
+    SMS 2FA is convenient but less secure than app-based 2FA due to potential SIM swapping attacks.
+  </Tab>
+
+  <Tab title="Hardware Keys">
+    **Supported Standards:**
+    - FIDO2/WebAuthn
+    - U2F (Universal 2nd Factor)
+    
+    **Compatible Devices:**
+    - YubiKey Series 5
+    - Google Titan Security Keys
+    - Feitian ePass Keys
+    - SoloKeys
+  </Tab>
+</Tabs>
+
+## Advanced Security Features
+
+### 🕵️ **Transaction Monitoring**
+
+M.O.N.K.Y includes intelligent monitoring systems to detect and prevent suspicious activity:
+
+#### Real-time Alerts
+- **Large Transaction Alerts**: Notifications for transactions above your set threshold
+- **New Device Login**: Alerts when wallet is accessed from a new device
+- **Unusual Activity**: Machine learning detection of abnormal transaction patterns
+- **Smart Contract Interactions**: Warnings for interacting with unverified contracts
+
+#### Security Dashboard
+- **Recent Activity**: Real-time view of all wallet interactions
+- **Security Score**: Dynamic assessment of your wallet's security status
+- **Risk Assessment**: Analysis of potential security vulnerabilities
+- **Recommendations**: Personalized suggestions to improve security
+
+### 🌐 **Network Security**
+
+#### RPC Protection
+- **Encrypted Connections**: All blockchain communications use HTTPS/WSS
+- **Multiple RPC Endpoints**: Automatic failover to prevent single points of failure
+- **Rate Limiting**: Protection against spam and DoS attacks
+- **Response Validation**: All blockchain responses are cryptographically verified
+
+#### Anti-Phishing
+- **Domain Verification**: Automatic detection of phishing websites
+- **Certificate Pinning**: Protection against man-in-the-middle attacks
+- **URL Validation**: Warnings for suspicious links and redirects
+- **Browser Extension Protection**: Detection of malicious browser extensions
+
+### 🔍 **Audit Trail**
+
+Complete transparency with comprehensive logging:
+
+<CardGroup cols={2}>
+  <Card title="Transaction History" icon="clock-rotate-left">
+    Complete record of all transactions with timestamps and block confirmations.
+  </Card>
+  <Card title="Access Logs" icon="file-lines">
+    Detailed logs of all wallet access attempts and security events.
+  </Card>
+  <Card title="Configuration Changes" icon="gear">
+    History of all security setting modifications and updates.
+  </Card>
+  <Card title="Export Options" icon="download">
+    Export logs and transaction history for external analysis and record keeping.
+  </Card>
+</CardGroup>
+
+## Security Best Practices
+
+### 🎯 **For Users**
+
+<Steps>
+  <Step title="Secure Your Recovery Phrase">
+    Write down your 12/24-word recovery phrase and store it in multiple secure locations. Never store it digitally or share it with anyone.
+  </Step>
+  <Step title="Enable 2FA">
+    Activate two-factor authentication using an authenticator app for maximum security.
+  </Step>
+  <Step title="Use Strong Passwords">
+    Create a unique, complex password for your wallet. Consider using a password manager.
+  </Step>
+  <Step title="Keep Software Updated">
+    Always use the latest version of M.O.N.K.Y to ensure you have the latest security patches.
+  </Step>
+  <Step title="Verify Transactions">
+    Always double-check transaction details, especially recipient addresses and amounts.
+  </Step>
+  <Step title="Use Hardware Wallets">
+    For large amounts, consider using a hardware wallet for additional security.
+  </Step>
+</Steps>
+
+### 🏢 **For Organizations**
+
+<Steps>
+  <Step title="Multi-Signature Setup">
+    Implement multi-signature wallets with appropriate thresholds for your organization's needs.
+  </Step>
+  <Step title="Role-Based Access">
+    Assign different permission levels to team members based on their responsibilities.
+  </Step>
+  <Step title="Regular Security Audits">
+    Conduct periodic reviews of access controls and security configurations.
+  </Step>
+  <Step title="Employee Training">
+    Educate team members about phishing, social engineering, and security best practices.
+  </Step>
+  <Step title="Incident Response Plan">
+    Develop and maintain a plan for responding to potential security breaches.
+  </Step>
+</Steps>
+
+## Security Certifications
+
+<CardGroup cols={2}>
+  <Card title="🔍 Security Audits" icon="magnifying-glass">
+    **Audit Partners:**
+    - CertiK (Blockchain Security)
+    - Quantstamp (Smart Contract Audit)
+    - Trail of Bits (Application Security)
+    
+    **Audit Scope:**
+    - Smart contract security
+    - Web application vulnerabilities  
+    - Infrastructure security
+    - Cryptographic implementation
+  </Card>
+  <Card title="🏆 Compliance" icon="certificate">
+    **Standards:**
+    - SOC 2 Type II Compliance
+    - ISO 27001 Certification
+    - GDPR Compliance
+    - CCPA Compliance
+    
+    **Regular Reviews:**
+    - Annual third-party audits
+    - Quarterly internal assessments
+    - Continuous monitoring
+    - Penetration testing
+  </Card>
+</CardGroup>
+
+## Incident Response
+
+### 🚨 **Emergency Procedures**
+
+If you suspect your wallet has been compromised:
+
+<Steps>
+  <Step title="Immediate Actions">
+    1. **Stop all transactions** - Don't send or receive any funds
+    2. **Change passwords** - Update your wallet password immediately
+    3. **Check recent activity** - Review transaction history for unauthorized activity
+    4. **Enable additional security** - Activate all available 2FA methods
+  </Step>
+  <Step title="Contact Support">
+    Reach out to our security team immediately:
+    - **Email**: security@monkywallet.com
+    - **Telegram**: @monky_os_bot
+    - **Emergency Hotline**: Available 24/7
+  </Step>
+  <Step title="Recovery Process">
+    Work with our support team to:
+    - Assess the extent of the compromise
+    - Implement recovery procedures
+    - Secure remaining assets
+    - Implement additional security measures
+  </Step>
+</Steps>
+
+### 📞 **Security Support**
+
+Our security team is available 24/7 to help with:
+- Security incident response
+- Account recovery assistance
+- Security configuration guidance
+- Threat assessment and mitigation
+
+---
+
+<Tip>
+**Remember**: The best security is layered security. Use multiple security measures together for maximum protection of your digital assets.
+</Tip>
+
+<Warning>
+**Never share your private keys or recovery phrase with anyone**, including M.O.N.K.Y support staff. Legitimate support will never ask for this information.
+</Warning>

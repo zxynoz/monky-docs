@@ -1,0 +1,99 @@
+{
+  "$schema": "https://mintlify.com/schema.json",
+  "name": "M.O.N.K.Y Documentation",
+  "logo": {
+    "dark": "/logo/monky-logo.png",
+    "light": "/logo/monky-logo.png"
+  },
+  "favicon": "/favicon.png",
+  "colors": {
+    "primary": "#9333ea",
+    "light": "#c084fc",
+    "dark": "#7c3aed",
+    "anchors": {
+      "from": "#9333ea",
+      "to": "#ec4899"
+    }
+  },
+  "topbarLinks": [
+    {
+      "name": "Support",
+      "url": "mailto:support@monkywallet.com"
+    }
+  ],
+  "topbarCtaButton": {
+    "name": "Get Started",
+    "url": "https://t.me/monky_os_bot"
+  },
+  "tabs": [
+    {
+      "name": "API Reference",
+      "url": "api-reference"
+    }
+  ],
+  "anchors": [
+    {
+      "name": "Documentation",
+      "icon": "book-open-cover",
+      "url": "https://docs.monkywallet.com"
+    },
+    {
+      "name": "Community",
+      "icon": "slack",
+      "url": "https://x.com/monkywallet"
+    },
+    {
+      "name": "Telegram Bot",
+      "icon": "telegram",
+      "url": "https://t.me/monky_os_bot"
+    }
+  ],
+  "navigation": [
+    {
+      "group": "Get Started",
+      "pages": [
+        "introduction",
+        "quickstart",
+        "overview"
+      ]
+    },
+    {
+      "group": "Features",
+      "pages": [
+        "features/security",
+        "features/transactions",
+        "features/staking",
+        "features/portfolio"
+      ]
+    },
+    {
+      "group": "Guides",
+      "pages": [
+        "guides/wallet-setup",
+        "guides/first-transaction",
+        "guides/security-best-practices",
+        "guides/troubleshooting"
+      ]
+    },
+    {
+      "group": "API Documentation",
+      "pages": [
+        "api-reference/introduction",
+        "api-reference/telegram-bot",
+        "api-reference/webhooks"
+      ]
+    },
+    {
+      "group": "Support",
+      "pages": [
+        "support/faq",
+        "support/contact"
+      ]
+    }
+  ],
+  "footerSocials": {
+    "x": "https://x.com/monkywallet",
+    "telegram": "https://t.me/monky_os_bot",
+    "website": "https://monkywallet.com"
+  }
+}
