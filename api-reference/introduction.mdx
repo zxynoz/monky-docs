@@ -1,0 +1,260 @@
+---
+title: "API Reference"
+description: "Complete API documentation for integrating with M.O.N.K.Y services and bot."
+icon: "code"
+---
+
+# M.O.N.K.Y API Reference
+
+Welcome to the M.O.N.K.Y API documentation! Our API allows you to integrate with M.O.N.K.Y services, interact with our Telegram bot, and access wallet functionalities programmatically.
+
+<Note>
+**Beta API**: The M.O.N.K.Y API is currently in beta. Features and endpoints may change. Join our [Telegram](https://t.me/monky_os_bot) for the latest updates.
+</Note>
+
+## Base URL
+
+```
+https://api.monkywallet.com/v1
+```
+
+## Authentication
+
+All API requests require authentication using an API key. Include your API key in the request headers:
+
+```bash
+curl -H "Authorization: Bearer YOUR_API_KEY" \
+     -H "Content-Type: application/json" \
+     https://api.monkywallet.com/v1/wallet/balance
+```
+
+### Getting Your API Key
+
+<Steps>
+  <Step title="Connect to Telegram Bot">
+    Start a conversation with our [Telegram Bot](https://t.me/monky_os_bot)
+  </Step>
+  <Step title="Request API Access">
+    Send `/api` command to request developer access
+  </Step>
+  <Step title="Verify Identity">
+    Complete the verification process
+  </Step>
+  <Step title="Receive API Key">
+    Get your unique API key via secure message
+  </Step>
+</Steps>
+
+## Rate Limiting
+
+API requests are rate limited to ensure fair usage:
+
+<CardGroup cols={2}>
+  <Card title="Free Tier" icon="free">
+    - **100 requests/hour**
+    - Basic wallet operations
+    - Community support
+  </Card>
+  <Card title="Pro Tier" icon="crown">
+    - **1,000 requests/hour**
+    - Advanced features
+    - Priority support
+    - Webhook access
+  </Card>
+</CardGroup>
+
+## Response Format
+
+All API responses follow a consistent JSON format:
+
+```json
+{
+  "success": true,
+  "data": {
+    // Response data here
+  },
+  "message": "Operation completed successfully",
+  "timestamp": "2024-10-24T07:37:42Z"
+}
+```
+
+### Error Responses
+
+When an error occurs, the API returns:
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "INVALID_REQUEST",
+    "message": "The request parameters are invalid",
+    "details": "Missing required field: address"
+  },
+  "timestamp": "2024-10-24T07:37:42Z"
+}
+```
+
+## Common Error Codes
+
+| Code | Status | Description |
+|------|--------|-------------|
+| `INVALID_API_KEY` | 401 | API key is missing or invalid |
+| `RATE_LIMIT_EXCEEDED` | 429 | Too many requests |
+| `INVALID_REQUEST` | 400 | Request format or parameters are invalid |
+| `WALLET_NOT_FOUND` | 404 | Specified wallet does not exist |
+| `INSUFFICIENT_FUNDS` | 422 | Not enough balance for transaction |
+| `NETWORK_ERROR` | 503 | Solana network is temporarily unavailable |
+
+## Core Endpoints
+
+### Wallet Operations
+
+<CardGroup cols={2}>
+  <Card title="Get Balance" icon="wallet" href="/api-reference/wallet#get-balance">
+    Retrieve wallet balance for SOL and SPL tokens
+  </Card>
+  <Card title="Send Transaction" icon="paper-plane" href="/api-reference/wallet#send-transaction">
+    Send SOL or SPL tokens to another address
+  </Card>
+  <Card title="Transaction History" icon="clock-rotate-left" href="/api-reference/wallet#transaction-history">
+    Get transaction history for a wallet
+  </Card>
+  <Card title="Create Wallet" icon="plus" href="/api-reference/wallet#create-wallet">
+    Generate a new Solana wallet
+  </Card>
+</CardGroup>
+
+### Trading & DeFi
+
+<CardGroup cols={2}>
+  <Card title="Token Swap" icon="arrows-spin" href="/api-reference/defi#token-swap">
+    Swap between SOL and SPL tokens
+  </Card>
+  <Card title="Stake SOL" icon="coins" href="/api-reference/defi#stake-sol">
+    Stake SOL with validators
+  </Card>
+  <Card title="Get Prices" icon="chart-line" href="/api-reference/defi#get-prices">
+    Real-time token price data
+  </Card>
+  <Card title="Pool Info" icon="database" href="/api-reference/defi#pool-info">
+    Liquidity pool information
+  </Card>
+</CardGroup>
+
+### Bot Integration
+
+<CardGroup cols={2}>
+  <Card title="Send Message" icon="telegram" href="/api-reference/telegram-bot#send-message">
+    Send messages via Telegram bot
+  </Card>
+  <Card title="User Commands" icon="terminal" href="/api-reference/telegram-bot#user-commands">
+    Handle user commands and interactions
+  </Card>
+  <Card title="Notifications" icon="bell" href="/api-reference/webhooks#notifications">
+    Set up transaction notifications
+  </Card>
+  <Card title="Webhooks" icon="webhook" href="/api-reference/webhooks#setup">
+    Configure webhook endpoints
+  </Card>
+</CardGroup>
+
+## SDK Examples
+
+### JavaScript/TypeScript
+
+```javascript
+import { MonkyAPI } from '@monky/api-sdk';
+
+const monky = new MonkyAPI({
+  apiKey: 'your-api-key',
+  network: 'mainnet' // or 'devnet'
+});
+
+// Get wallet balance
+const balance = await monky.wallet.getBalance('WALLET_ADDRESS');
+console.log(`SOL Balance: ${balance.sol}`);
+
+// Send transaction
+const tx = await monky.wallet.sendTransaction({
+  from: 'SENDER_ADDRESS',
+  to: 'RECIPIENT_ADDRESS',
+  amount: 0.1, // SOL
+  token: 'SOL'
+});
+```
+
+### Python
+
+```python
+from monky_api import MonkyClient
+
+client = MonkyClient(
+    api_key='your-api-key',
+    network='mainnet'
+)
+
+# Get wallet balance
+balance = client.wallet.get_balance('WALLET_ADDRESS')
+print(f"SOL Balance: {balance['sol']}")
+
+# Send transaction
+tx = client.wallet.send_transaction(
+    from_address='SENDER_ADDRESS',
+    to_address='RECIPIENT_ADDRESS',
+    amount=0.1,
+    token='SOL'
+)
+```
+
+### curl
+
+```bash
+# Get wallet balance
+curl -X GET \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  "https://api.monkywallet.com/v1/wallet/balance?address=WALLET_ADDRESS"
+
+# Send transaction
+curl -X POST \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"from":"SENDER_ADDRESS","to":"RECIPIENT_ADDRESS","amount":0.1,"token":"SOL"}' \
+  "https://api.monkywallet.com/v1/wallet/send"
+```
+
+## Webhooks
+
+Set up webhooks to receive real-time notifications:
+
+```json
+{
+  "url": "https://your-app.com/webhooks/monky",
+  "events": [
+    "transaction.confirmed",
+    "balance.updated", 
+    "stake.reward"
+  ],
+  "secret": "your-webhook-secret"
+}
+```
+
+## Need Help?
+
+<CardGroup cols={3}>
+  <Card title="Telegram Bot" icon="telegram" href="https://t.me/monky_os_bot">
+    Get instant help and support through our bot
+  </Card>
+  <Card title="Developer Support" icon="envelope" href="mailto:api@monkywallet.com">
+    Technical support for API integration
+  </Card>
+  <Card title="Community" icon="x-twitter" href="https://x.com/monkywallet">
+    Join our developer community
+  </Card>
+</CardGroup>
+
+---
+
+<Tip>
+**Pro Tip**: Use our [Telegram Bot](https://t.me/monky_os_bot) to test API functionality before integrating into your application!
+</Tip>

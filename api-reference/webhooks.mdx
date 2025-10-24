@@ -1,0 +1,618 @@
+---
+title: "Webhooks"
+description: "Real-time event notifications via webhooks for transaction updates, price alerts, and more."
+icon: "webhook"
+---
+
+# Webhooks
+
+Webhooks allow your application to receive real-time notifications when specific events occur in the M.O.N.K.Y ecosystem. Instead of continuously polling our API, webhooks push data to your endpoints as events happen.
+
+## Overview
+
+M.O.N.K.Y webhooks are HTTP callbacks that we send to your specified endpoints when triggered events occur. This enables you to:
+
+- Get instant notifications about transaction confirmations
+- Receive real-time balance updates
+- Monitor staking reward distributions
+- Track price movements and alerts
+- Handle user authentication events
+
+## Getting Started
+
+### 1. Set Up Your Endpoint
+
+Create an HTTPS endpoint on your server to receive webhook payloads:
+
+```javascript path=null start=null
+// Express.js example
+const express = require('express');
+const app = express();
+
+app.use(express.json());
+
+app.post('/webhook/monky', (req, res) => {
+  const { event, data, signature, timestamp } = req.body;
+  
+  // Verify webhook signature
+  if (!verifySignature(req.body, req.headers['x-monky-signature'])) {
+    return res.status(401).send('Unauthorized');
+  }
+  
+  // Process the webhook event
+  handleWebhookEvent(event, data);
+  
+  res.status(200).send('OK');
+});
+
+app.listen(3000, () => {
+  console.log('Webhook server listening on port 3000');
+});
+```
+
+### 2. Register Your Webhook
+
+Register your endpoint with the M.O.N.K.Y API:
+
+```http
+POST /v1/webhooks
+Content-Type: application/json
+Authorization: Bearer YOUR_API_TOKEN
+
+{
+  "url": "https://your-domain.com/webhook/monky",
+  "events": [
+    "transaction.confirmed",
+    "balance.updated",
+    "price.alert",
+    "stake.reward"
+  ],
+  "secret": "your-webhook-secret",
+  "active": true
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "webhook_id": "wh_123456789",
+    "url": "https://your-domain.com/webhook/monky",
+    "events": ["transaction.confirmed", "balance.updated"],
+    "created_at": "2024-10-24T07:37:42Z",
+    "active": true
+  }
+}
+```
+
+### 3. Verify Webhook Signatures
+
+Always verify webhook signatures to ensure authenticity:
+
+```javascript path=null start=null
+const crypto = require('crypto');
+
+function verifySignature(payload, signature, secret) {
+  const expectedSignature = crypto
+    .createHmac('sha256', secret)
+    .update(JSON.stringify(payload))
+    .digest('hex');
+    
+  return `sha256=${expectedSignature}` === signature;
+}
+```
+
+## Event Types
+
+### Transaction Events
+
+<AccordionGroup>
+  <Accordion title="transaction.pending">
+    Triggered when a transaction is submitted to the network
+    
+    ```json
+    {
+      "event": "transaction.pending",
+      "data": {
+        "transaction_id": "tx_abc123",
+        "wallet_address": "9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM",
+        "amount": "1.5",
+        "token": "SOL",
+        "type": "send",
+        "recipient": "7xKxVqNqTgK9QhQVsQRAyrZzDsGYdLVL9zYtAWWB",
+        "submitted_at": "2024-10-24T07:37:42Z"
+      },
+      "timestamp": "2024-10-24T07:37:42Z"
+    }
+    ```
+  </Accordion>
+
+  <Accordion title="transaction.confirmed">
+    Triggered when a transaction receives network confirmation
+    
+    ```json
+    {
+      "event": "transaction.confirmed",
+      "data": {
+        "transaction_id": "tx_abc123",
+        "signature": "5J7...9xY",
+        "wallet_address": "9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM",
+        "amount": "1.5",
+        "token": "SOL",
+        "fee": "0.000005",
+        "type": "send",
+        "recipient": "7xKxVqNqTgK9QhQVsQRAyrZzDsGYdLVL9zYtAWWB",
+        "block_height": 234567890,
+        "confirmations": 32,
+        "confirmed_at": "2024-10-24T07:38:15Z"
+      },
+      "timestamp": "2024-10-24T07:38:15Z"
+    }
+    ```
+  </Accordion>
+
+  <Accordion title="transaction.failed">
+    Triggered when a transaction fails or is rejected
+    
+    ```json
+    {
+      "event": "transaction.failed",
+      "data": {
+        "transaction_id": "tx_def456",
+        "wallet_address": "9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM",
+        "amount": "1.5",
+        "token": "SOL",
+        "type": "send",
+        "error_code": "INSUFFICIENT_BALANCE",
+        "error_message": "Insufficient balance for transaction",
+        "failed_at": "2024-10-24T07:37:45Z"
+      },
+      "timestamp": "2024-10-24T07:37:45Z"
+    }
+    ```
+  </Accordion>
+
+  <Accordion title="transaction.received">
+    Triggered when the wallet receives an incoming transaction
+    
+    ```json
+    {
+      "event": "transaction.received",
+      "data": {
+        "transaction_id": "tx_ghi789",
+        "signature": "3K8...7zA",
+        "wallet_address": "9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM",
+        "amount": "2.0",
+        "token": "SOL",
+        "sender": "4pQrNmKxVqNqTgK9QhQVsQRAyrZzDsGYdLVL9zYt",
+        "received_at": "2024-10-24T07:39:00Z"
+      },
+      "timestamp": "2024-10-24T07:39:00Z"
+    }
+    ```
+  </Accordion>
+</AccordionGroup>
+
+### Wallet Events
+
+<AccordionGroup>
+  <Accordion title="balance.updated">
+    Triggered when wallet balance changes
+    
+    ```json
+    {
+      "event": "balance.updated",
+      "data": {
+        "wallet_address": "9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM",
+        "balances": {
+          "SOL": {
+            "amount": "4.25",
+            "usd_value": "850.00",
+            "change": "+0.5"
+          },
+          "USDC": {
+            "amount": "1250.00",
+            "usd_value": "1250.00", 
+            "change": "0"
+          }
+        },
+        "total_usd_value": "2100.00",
+        "updated_at": "2024-10-24T07:39:00Z"
+      },
+      "timestamp": "2024-10-24T07:39:00Z"
+    }
+    ```
+  </Accordion>
+
+  <Accordion title="wallet.connected">
+    Triggered when a new wallet is connected to the platform
+    
+    ```json
+    {
+      "event": "wallet.connected",
+      "data": {
+        "user_id": "usr_12345",
+        "wallet_address": "9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM",
+        "wallet_type": "phantom",
+        "connected_at": "2024-10-24T07:30:00Z"
+      },
+      "timestamp": "2024-10-24T07:30:00Z"
+    }
+    ```
+  </Accordion>
+
+  <Accordion title="wallet.disconnected">
+    Triggered when a wallet is disconnected from the platform
+    
+    ```json
+    {
+      "event": "wallet.disconnected",
+      "data": {
+        "user_id": "usr_12345",
+        "wallet_address": "9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM",
+        "disconnected_at": "2024-10-24T08:30:00Z",
+        "reason": "user_initiated"
+      },
+      "timestamp": "2024-10-24T08:30:00Z"
+    }
+    ```
+  </Accordion>
+</AccordionGroup>
+
+### Price Alert Events
+
+<AccordionGroup>
+  <Accordion title="price.alert">
+    Triggered when a price alert condition is met
+    
+    ```json
+    {
+      "event": "price.alert",
+      "data": {
+        "alert_id": "alert_789",
+        "user_id": "usr_12345",
+        "token": "SOL",
+        "condition": "above",
+        "target_price": "200.00",
+        "current_price": "201.50",
+        "triggered_at": "2024-10-24T07:45:00Z"
+      },
+      "timestamp": "2024-10-24T07:45:00Z"
+    }
+    ```
+  </Accordion>
+
+  <Accordion title="price.significant_change">
+    Triggered when token prices have significant movements
+    
+    ```json
+    {
+      "event": "price.significant_change",
+      "data": {
+        "token": "SOL",
+        "previous_price": "200.00",
+        "current_price": "190.00",
+        "change_percent": -5.0,
+        "change_amount": "-10.00",
+        "timeframe": "1h",
+        "triggered_at": "2024-10-24T08:00:00Z"
+      },
+      "timestamp": "2024-10-24T08:00:00Z"
+    }
+    ```
+  </Accordion>
+</AccordionGroup>
+
+### Staking Events
+
+<AccordionGroup>
+  <Accordion title="stake.delegated">
+    Triggered when SOL is delegated to a validator
+    
+    ```json
+    {
+      "event": "stake.delegated",
+      "data": {
+        "user_id": "usr_12345",
+        "wallet_address": "9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM",
+        "validator_address": "7K2nUkdq3BkVGhQRaqBiLxfpGpPy7YF8...",
+        "amount": "10.0",
+        "transaction_signature": "4kK7...8nR",
+        "delegated_at": "2024-10-24T07:50:00Z"
+      },
+      "timestamp": "2024-10-24T07:50:00Z"
+    }
+    ```
+  </Accordion>
+
+  <Accordion title="stake.reward">
+    Triggered when staking rewards are distributed
+    
+    ```json
+    {
+      "event": "stake.reward",
+      "data": {
+        "user_id": "usr_12345",
+        "wallet_address": "9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM",
+        "reward_amount": "0.1234",
+        "epoch": 487,
+        "validator_address": "7K2nUkdq3BkVGhQRaqBiLxfpGpPy7YF8...",
+        "distributed_at": "2024-10-24T08:15:00Z"
+      },
+      "timestamp": "2024-10-24T08:15:00Z"
+    }
+    ```
+  </Accordion>
+
+  <Accordion title="stake.undelegated">
+    Triggered when stake is undelegated from a validator
+    
+    ```json
+    {
+      "event": "stake.undelegated",
+      "data": {
+        "user_id": "usr_12345",
+        "wallet_address": "9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM",
+        "validator_address": "7K2nUkdq3BkVGhQRaqBiLxfpGpPy7YF8...",
+        "amount": "5.0",
+        "transaction_signature": "9mP3...2xT",
+        "cooldown_end": "2024-10-27T08:15:00Z",
+        "undelegated_at": "2024-10-24T08:15:00Z"
+      },
+      "timestamp": "2024-10-24T08:15:00Z"
+    }
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Webhook Management
+
+### List All Webhooks
+
+```http
+GET /v1/webhooks
+Authorization: Bearer YOUR_API_TOKEN
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "webhooks": [
+      {
+        "webhook_id": "wh_123456789",
+        "url": "https://your-domain.com/webhook/monky",
+        "events": ["transaction.confirmed", "balance.updated"],
+        "active": true,
+        "created_at": "2024-10-24T07:37:42Z",
+        "last_triggered": "2024-10-24T09:15:00Z"
+      }
+    ],
+    "total_count": 1
+  }
+}
+```
+
+### Update Webhook
+
+```http
+PUT /v1/webhooks/{webhook_id}
+Content-Type: application/json
+Authorization: Bearer YOUR_API_TOKEN
+
+{
+  "url": "https://new-domain.com/webhook/monky",
+  "events": ["transaction.confirmed", "price.alert"],
+  "active": true
+}
+```
+
+### Delete Webhook
+
+```http
+DELETE /v1/webhooks/{webhook_id}
+Authorization: Bearer YOUR_API_TOKEN
+```
+
+### Test Webhook
+
+Send a test payload to verify your endpoint:
+
+```http
+POST /v1/webhooks/{webhook_id}/test
+Authorization: Bearer YOUR_API_TOKEN
+```
+
+## Best Practices
+
+### 1. Handle Idempotency
+
+Webhooks may be delivered multiple times. Use the `transaction_id` or event ID to implement idempotency:
+
+```javascript path=null start=null
+const processedEvents = new Set();
+
+function handleWebhookEvent(event, data) {
+  const eventId = data.transaction_id || data.alert_id || data.user_id;
+  
+  if (processedEvents.has(eventId)) {
+    console.log('Event already processed:', eventId);
+    return;
+  }
+  
+  // Process the event
+  processEvent(event, data);
+  
+  // Mark as processed
+  processedEvents.add(eventId);
+}
+```
+
+### 2. Implement Retry Logic
+
+Handle failed webhook deliveries gracefully:
+
+```javascript path=null start=null
+app.post('/webhook/monky', (req, res) => {
+  try {
+    // Process webhook
+    handleWebhookEvent(req.body.event, req.body.data);
+    res.status(200).send('OK');
+  } catch (error) {
+    console.error('Webhook processing failed:', error);
+    // Return 5xx status to trigger retry
+    res.status(500).send('Internal Server Error');
+  }
+});
+```
+
+### 3. Secure Your Endpoint
+
+Always verify webhook signatures and use HTTPS:
+
+```javascript path=null start=null
+app.post('/webhook/monky', (req, res) => {
+  const signature = req.headers['x-monky-signature'];
+  const timestamp = req.headers['x-monky-timestamp'];
+  
+  // Verify timestamp (prevent replay attacks)
+  if (Date.now() - parseInt(timestamp) > 300000) { // 5 minutes
+    return res.status(401).send('Request too old');
+  }
+  
+  // Verify signature
+  if (!verifySignature(req.body, signature, process.env.WEBHOOK_SECRET)) {
+    return res.status(401).send('Invalid signature');
+  }
+  
+  // Process webhook...
+});
+```
+
+### 4. Log Webhook Events
+
+Maintain detailed logs for debugging and monitoring:
+
+```javascript path=null start=null
+function handleWebhookEvent(event, data) {
+  console.log('Webhook received:', {
+    event,
+    timestamp: new Date().toISOString(),
+    data: JSON.stringify(data)
+  });
+  
+  try {
+    processEvent(event, data);
+    console.log('Webhook processed successfully:', event);
+  } catch (error) {
+    console.error('Webhook processing error:', error);
+    throw error;
+  }
+}
+```
+
+## Rate Limits
+
+Webhook deliveries are subject to rate limits:
+
+- **Maximum Attempts:** 5 retry attempts per webhook
+- **Retry Delays:** Exponential backoff (1s, 2s, 4s, 8s, 16s)
+- **Timeout:** 30 seconds per delivery attempt
+- **Maximum Events:** 10,000 webhook events per hour per endpoint
+
+## Troubleshooting
+
+### Common Issues
+
+<AccordionGroup>
+  <Accordion title="Webhook Not Receiving Events">
+    **Possible Causes:**
+    - Endpoint URL not accessible from the internet
+    - Firewall blocking incoming requests
+    - SSL certificate issues with HTTPS endpoint
+    - Webhook is inactive or misconfigured
+    
+    **Solutions:**
+    - Test endpoint accessibility with tools like ngrok for development
+    - Check webhook status via API
+    - Verify SSL certificate is valid
+    - Use webhook test endpoint to verify configuration
+  </Accordion>
+
+  <Accordion title="Signature Verification Failing">
+    **Possible Causes:**
+    - Incorrect webhook secret
+    - Body parsing changing the payload
+    - Clock synchronization issues
+    
+    **Solutions:**
+    - Verify webhook secret matches registered value
+    - Use raw body for signature verification
+    - Check system time synchronization
+  </Accordion>
+
+  <Accordion title="Duplicate Events">
+    **Possible Causes:**
+    - Network issues causing retries
+    - Multiple webhook endpoints registered
+    - Processing errors causing failed deliveries
+    
+    **Solutions:**
+    - Implement idempotency using event IDs
+    - Check for duplicate webhook registrations
+    - Ensure proper HTTP status codes in responses
+  </Accordion>
+</AccordionGroup>
+
+## Webhook Monitoring
+
+Monitor webhook health and performance:
+
+```javascript path=null start=null
+// Webhook metrics tracking
+const webhookMetrics = {
+  totalReceived: 0,
+  totalProcessed: 0,
+  totalErrors: 0,
+  lastReceived: null,
+  processingTimes: []
+};
+
+app.post('/webhook/monky', (req, res) => {
+  const startTime = Date.now();
+  webhookMetrics.totalReceived++;
+  webhookMetrics.lastReceived = new Date().toISOString();
+  
+  try {
+    handleWebhookEvent(req.body.event, req.body.data);
+    webhookMetrics.totalProcessed++;
+    res.status(200).send('OK');
+  } catch (error) {
+    webhookMetrics.totalErrors++;
+    res.status(500).send('Error');
+  } finally {
+    const processingTime = Date.now() - startTime;
+    webhookMetrics.processingTimes.push(processingTime);
+    
+    // Keep only last 100 processing times
+    if (webhookMetrics.processingTimes.length > 100) {
+      webhookMetrics.processingTimes.shift();
+    }
+  }
+});
+
+// Health check endpoint
+app.get('/webhook/health', (req, res) => {
+  res.json(webhookMetrics);
+});
+```
+
+Need help with webhooks? Check our [FAQ](/support/faq) or contact our technical support team.
+
+---
+
+<Tip>
+**Development Tip:** Use tools like ngrok or webhook.site for testing webhooks during development.
+</Tip>

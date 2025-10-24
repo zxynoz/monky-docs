@@ -1,0 +1,442 @@
+---
+title: "Telegram Bot API"
+description: "Integration guide for M.O.N.K.Y Telegram Bot - automate interactions and notifications."
+icon: "telegram"
+---
+
+# Telegram Bot Integration
+
+The M.O.N.K.Y Telegram Bot provides a seamless way to interact with your Solana wallet directly from Telegram. Our bot API allows developers to integrate wallet functionality, notifications, and user interactions.
+
+## Bot Information
+
+**Bot Username:** [@monky_os_bot](https://t.me/monky_os_bot)  
+**Bot API Endpoint:** `https://api.monkywallet.com/v1/telegram`
+
+## Getting Started
+
+### 1. Start the Bot
+
+Begin by starting a conversation with our bot:
+
+<Card title="Start Chat" icon="telegram" href="https://t.me/monky_os_bot">
+  Click here to start chatting with M.O.N.K.Y Bot
+</Card>
+
+### 2. Available Commands
+
+<AccordionGroup>
+  <Accordion title="/start - Initialize Bot">
+    Initializes the bot and creates your user profile
+    
+    **Usage:** `/start`
+    
+    **Response:** Welcome message with available commands
+  </Accordion>
+
+  <Accordion title="/wallet - Wallet Operations">
+    Access wallet-related functions
+    
+    **Usage:** `/wallet [action]`
+    
+    **Actions:**
+    - `balance` - Check wallet balance
+    - `address` - Get wallet address
+    - `new` - Create new wallet
+    
+    **Example:** `/wallet balance`
+  </Accordion>
+
+  <Accordion title="/send - Send Transaction">
+    Send SOL or tokens to another address
+    
+    **Usage:** `/send [amount] [token] [address]`
+    
+    **Example:** `/send 0.1 SOL 9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM`
+  </Accordion>
+
+  <Accordion title="/price - Token Prices">
+    Get real-time token prices
+    
+    **Usage:** `/price [token]`
+    
+    **Example:** `/price SOL`
+  </Accordion>
+
+  <Accordion title="/stake - Staking Operations">
+    Manage SOL staking
+    
+    **Usage:** `/stake [action] [amount]`
+    
+    **Actions:**
+    - `delegate [amount]` - Stake SOL
+    - `undelegate [amount]` - Unstake SOL
+    - `rewards` - Check staking rewards
+    
+    **Example:** `/stake delegate 1`
+  </Accordion>
+
+  <Accordion title="/notifications - Alert Settings">
+    Configure transaction and price alerts
+    
+    **Usage:** `/notifications [action]`
+    
+    **Actions:**
+    - `on` - Enable notifications
+    - `off` - Disable notifications
+    - `settings` - View current settings
+  </Accordion>
+
+  <Accordion title="/help - Get Help">
+    Display help information and support options
+    
+    **Usage:** `/help [topic]`
+    
+    **Topics:**
+    - `commands` - List all commands
+    - `security` - Security best practices
+    - `api` - API access information
+  </Accordion>
+</AccordionGroup>
+
+## Bot API Integration
+
+### Authentication
+
+To integrate with the bot programmatically, you'll need a bot token:
+
+<Steps>
+  <Step title="Request Bot Access">
+    Send `/api` command to the bot to request developer access
+  </Step>
+  <Step title="Verify Identity">
+    Complete identity verification process
+  </Step>
+  <Step title="Receive Token">
+    Get your bot integration token via secure message
+  </Step>
+</Steps>
+
+### Send Message API
+
+Send messages to users via the bot:
+
+```http
+POST /v1/telegram/send-message
+Content-Type: application/json
+Authorization: Bearer YOUR_BOT_TOKEN
+
+{
+  "chat_id": "USER_TELEGRAM_ID",
+  "message": "Your transaction has been confirmed!",
+  "parse_mode": "Markdown"
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "message_id": 12345,
+    "sent_at": "2024-10-24T07:37:42Z"
+  }
+}
+```
+
+### Execute Command API
+
+Execute bot commands programmatically:
+
+```http
+POST /v1/telegram/execute-command
+Content-Type: application/json
+Authorization: Bearer YOUR_BOT_TOKEN
+
+{
+  "chat_id": "USER_TELEGRAM_ID",
+  "command": "/wallet balance",
+  "silent": false
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "command": "/wallet balance",
+    "response": "💰 **Wallet Balance**\nSOL: 5.24\nUSDC: 1,250.00",
+    "executed_at": "2024-10-24T07:37:42Z"
+  }
+}
+```
+
+### User Registration API
+
+Check if a user is registered with the bot:
+
+```http
+GET /v1/telegram/user/{telegram_id}
+Authorization: Bearer YOUR_BOT_TOKEN
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "telegram_id": "123456789",
+    "username": "@user123",
+    "registered_at": "2024-10-20T10:30:00Z",
+    "wallet_connected": true,
+    "notifications_enabled": true
+  }
+}
+```
+
+## Webhook Integration
+
+Set up webhooks to receive bot events in real-time:
+
+### Configuration
+
+```http
+POST /v1/telegram/webhook
+Content-Type: application/json
+Authorization: Bearer YOUR_BOT_TOKEN
+
+{
+  "url": "https://your-app.com/webhook/telegram",
+  "events": [
+    "message.received",
+    "command.executed", 
+    "user.registered",
+    "wallet.connected"
+  ],
+  "secret": "your-webhook-secret"
+}
+```
+
+### Event Types
+
+<AccordionGroup>
+  <Accordion title="message.received">
+    Triggered when a user sends a message to the bot
+    
+    ```json
+    {
+      "event": "message.received",
+      "data": {
+        "chat_id": "123456789",
+        "username": "@user123",
+        "message": "Hello bot!",
+        "timestamp": "2024-10-24T07:37:42Z"
+      }
+    }
+    ```
+  </Accordion>
+
+  <Accordion title="command.executed">
+    Triggered when a user executes a bot command
+    
+    ```json
+    {
+      "event": "command.executed",
+      "data": {
+        "chat_id": "123456789",
+        "command": "/wallet balance",
+        "success": true,
+        "response": "Balance: 5.24 SOL",
+        "timestamp": "2024-10-24T07:37:42Z"
+      }
+    }
+    ```
+  </Accordion>
+
+  <Accordion title="user.registered">
+    Triggered when a new user starts using the bot
+    
+    ```json
+    {
+      "event": "user.registered",
+      "data": {
+        "chat_id": "123456789",
+        "username": "@newuser",
+        "first_name": "John",
+        "registered_at": "2024-10-24T07:37:42Z"
+      }
+    }
+    ```
+  </Accordion>
+
+  <Accordion title="wallet.connected">
+    Triggered when a user connects their wallet
+    
+    ```json
+    {
+      "event": "wallet.connected",
+      "data": {
+        "chat_id": "123456789",
+        "wallet_address": "9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM",
+        "connected_at": "2024-10-24T07:37:42Z"
+      }
+    }
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Bot Features
+
+### Security Features
+
+<CardGroup cols={2}>
+  <Card title="🔐 Encrypted Storage" icon="lock">
+    All sensitive data is encrypted before storage
+  </Card>
+  <Card title="🔑 Private Key Security" icon="key">
+    Private keys never leave your device
+  </Card>
+  <Card title="✅ Transaction Verification" icon="shield-check">
+    All transactions require explicit confirmation
+  </Card>
+  <Card title="🚨 Fraud Detection" icon="exclamation-triangle">
+    AI-powered fraud detection and alerts
+  </Card>
+</CardGroup>
+
+### Notification Types
+
+The bot can send various types of notifications:
+
+<Tabs>
+  <Tab title="Transaction Alerts">
+    - **Incoming Transactions:** Get notified when you receive tokens
+    - **Outgoing Confirmations:** Confirmation when your transactions are processed
+    - **Failed Transactions:** Alerts for failed or rejected transactions
+    - **Large Transactions:** Special alerts for transactions above your threshold
+  </Tab>
+
+  <Tab title="Price Alerts">
+    - **Price Targets:** Alerts when tokens hit your target prices
+    - **Percentage Changes:** Notifications for significant price movements
+    - **Portfolio Updates:** Daily/weekly portfolio summaries
+    - **Market News:** Important market updates affecting your holdings
+  </Tab>
+
+  <Tab title="Staking Rewards">
+    - **Reward Claims:** Notifications when staking rewards are available
+    - **Delegation Status:** Updates on your staking delegations
+    - **Validator Changes:** Alerts about validator performance changes
+    - **Unstaking Periods:** Reminders about unstaking cooldown periods
+  </Tab>
+</Tabs>
+
+## Example Integration
+
+Here's a complete example of integrating the M.O.N.K.Y bot into your application:
+
+```javascript
+class MonkyBotIntegration {
+  constructor(botToken) {
+    this.botToken = botToken;
+    this.baseUrl = 'https://api.monkywallet.com/v1/telegram';
+  }
+
+  async sendWelcomeMessage(chatId, userName) {
+    const response = await fetch(`${this.baseUrl}/send-message`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${this.botToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        chat_id: chatId,
+        message: `🎉 Welcome to M.O.N.K.Y, ${userName}!\n\nYour Solana wallet is ready. Type /help to get started.`,
+        parse_mode: 'Markdown'
+      })
+    });
+    
+    return response.json();
+  }
+
+  async checkUserWallet(chatId) {
+    const response = await fetch(`${this.baseUrl}/execute-command`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${this.botToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        chat_id: chatId,
+        command: '/wallet balance',
+        silent: false
+      })
+    });
+    
+    return response.json();
+  }
+
+  async setupNotifications(chatId, events) {
+    const response = await fetch(`${this.baseUrl}/user/${chatId}/notifications`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${this.botToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        enabled: true,
+        events: events
+      })
+    });
+    
+    return response.json();
+  }
+}
+
+// Usage
+const bot = new MonkyBotIntegration('your-bot-token');
+
+// Send welcome message to new user
+await bot.sendWelcomeMessage('123456789', '@newuser');
+
+// Check wallet balance
+const balance = await bot.checkUserWallet('123456789');
+
+// Enable notifications
+await bot.setupNotifications('123456789', [
+  'transaction.received',
+  'price.alert',
+  'stake.reward'
+]);
+```
+
+## Rate Limits
+
+Bot API calls are subject to rate limiting:
+
+- **Free Tier:** 50 requests/hour per bot token
+- **Pro Tier:** 500 requests/hour per bot token
+- **Message Sending:** 30 messages/minute per user
+
+## Support
+
+Need help with bot integration?
+
+<CardGroup cols={3}>
+  <Card title="Bot Support" icon="telegram" href="https://t.me/monky_os_bot">
+    Chat with our bot for technical support
+  </Card>
+  <Card title="Developer Email" icon="envelope" href="mailto:api@monkywallet.com">
+    Email our technical team
+  </Card>
+  <Card title="Documentation" icon="book-open-cover" href="/support/faq">
+    Check our comprehensive FAQ
+  </Card>
+</CardGroup>
+
+---
+
+<Tip>
+**Security Note:** Never share your bot token publicly. Keep it secure and rotate it regularly.
+</Tip>
