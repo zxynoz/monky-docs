@@ -33,11 +33,6 @@
   ],
   "anchors": [
     {
-      "name": "Documentation",
-      "icon": "book-open-cover",
-      "url": "https://docs.monkywallet.com"
-    },
-    {
       "name": "Community",
       "icon": "slack",
       "url": "https://x.com/monkywallet"
